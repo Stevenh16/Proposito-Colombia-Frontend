@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:swallow_app/screens/candidato/explorar/explorar_screen.dart';
+import 'package:swallow_app/screens/candidato/matches/matches_screen.dart';
+import 'package:swallow_app/screens/candidato/postulaciones/postulaciones_screen.dart';
+import '../screens/candidato/loading/loading_screen.dart';
+import '../screens/candidato/vacantes/vacantes_screen.dart';
 import 'route_names.dart';
-import '../screens/loading/loading_screen.dart';
-import '../screens/vacantes/vacantes_screen.dart';
-import '../screens/postulaciones/postulaciones_screen.dart';
-import '../screens/matches/matches_screen.dart';
-import '../screens/explorar/explorar_screen.dart';
+import '../screens/auth/select_user_type_screen.dart';
+
 import '../widgets/navigation/bottom_tab_navigator.dart';
+import '../widgets/navigation/empresa_bottom_navigator.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -13,20 +16,30 @@ class AppRouter {
       case RouteNames.loading:
         return MaterialPageRoute(builder: (_) => const LoadingScreen());
 
-      case RouteNames.home:
+      /*case RouteNames.selectUserType:
+        return MaterialPageRoute(builder: (_) => const SelectUserTypeScreen());*/
+      case RouteNames.login:
+        return MaterialPageRoute(builder: (_) => const SelectUserTypeScreen());
+
+    // Rutas Candidato
+      case RouteNames.homeCandidato:
         return MaterialPageRoute(builder: (_) => const BottomTabNavigator());
 
-      case RouteNames.vacantes:
-        return MaterialPageRoute(builder: (_) => const VacantesScreen());
+      /*case RouteNames.vacantesCandidato:
+        return MaterialPageRoute(builder: (_) => const VacantesScreen());*/
 
-      case RouteNames.postulaciones:
-        return MaterialPageRoute(builder: (_) => const PostulacionesScreen());
+      case RouteNames.postulacionesCandidato:
+        return MaterialPageRoute(builder: (_) => const PostulacionesCandidatoScreen());
 
-      case RouteNames.matches:
-        return MaterialPageRoute(builder: (_) => const MatchesScreen());
+      case RouteNames.matchesCandidato:
+        return MaterialPageRoute(builder: (_) => const MatchesCandidatoScreen());
 
-      case RouteNames.explorar:
-        return MaterialPageRoute(builder: (_) => const ExplorarScreen());
+      case RouteNames.explorarCandidato:
+        return MaterialPageRoute(builder: (_) => const ExplorarCandidatoScreen());
+
+    // Rutas Empresa
+      case RouteNames.homeEmpresa:
+        return MaterialPageRoute(builder: (_) => const EmpresaBottomNavigator());
 
       default:
         return MaterialPageRoute(

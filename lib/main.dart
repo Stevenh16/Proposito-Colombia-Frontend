@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:swallow_app/routes/route_names.dart';
 import 'providers/theme_provider.dart';
+import 'providers/auth_provider.dart';
+import 'providers/vacancy_provider.dart';
+import 'providers/candidate_provider.dart';
+import 'providers/application_provider.dart';
 import 'routes/app_router.dart';
+import 'routes/route_names.dart';
 
 void main() {
   runApp(const SwallowApp());
@@ -13,8 +17,14 @@ class SwallowApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => VacancyProvider()),
+        ChangeNotifierProvider(create: (_) => CandidateProvider()),
+        ChangeNotifierProvider(create: (_) => ApplicationProvider()),
+      ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {
           return MaterialApp(
@@ -22,7 +32,7 @@ class SwallowApp extends StatelessWidget {
             theme: themeProvider.lightTheme,
             darkTheme: themeProvider.darkTheme,
             themeMode: themeProvider.themeMode,
-            initialRoute: RouteNames.loading,
+            initialRoute: RouteNames.login,
             onGenerateRoute: AppRouter.generateRoute,
             debugShowCheckedModeBanner: false,
           );

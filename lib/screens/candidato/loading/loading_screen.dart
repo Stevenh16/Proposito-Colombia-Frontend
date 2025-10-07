@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../widgets/misc/golondrina.dart';
-import '../../widgets/misc/progress_bar.dart';
+
+import '../../../widgets/misc/golondrina.dart';
+import '../../../widgets/misc/progress_bar.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});

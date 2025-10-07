@@ -14,6 +14,7 @@ class CustomProgressBar extends StatefulWidget {
   State<CustomProgressBar> createState() => _CustomProgressBarState();
 }
 
+
 class _CustomProgressBarState extends State<CustomProgressBar>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
@@ -42,7 +43,9 @@ class _CustomProgressBarState extends State<CustomProgressBar>
         _hasRedirected = true;
         Future.delayed(const Duration(milliseconds: 500), () {
           if (mounted) {
-            Navigator.of(context).pushReplacementNamed(RouteNames.home);
+            Navigator.of(context).pushReplacementNamed(
+              RouteNames.login,// se cambio
+            );
           }
         });
       }

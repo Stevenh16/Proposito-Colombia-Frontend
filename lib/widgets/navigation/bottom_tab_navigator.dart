@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../screens/explorar/explorar_screen.dart';
-import '../../screens/matches/matches_screen.dart';
-import '../../screens/postulaciones/postulaciones_screen.dart';
-import '../../screens/vacantes/vacantes_screen.dart';
+import '../../screens/candidato/explorar/explorar_screen.dart';
+import '../../screens/candidato/matches/matches_screen.dart';
+import '../../screens/candidato/postulaciones/postulaciones_screen.dart';
+import '../../screens/candidato/vacantes/vacantes_screen.dart';
+
 
 class BottomTabNavigator extends StatefulWidget {
   const BottomTabNavigator({super.key});
@@ -17,9 +18,9 @@ class _BottomTabNavigatorState extends State<BottomTabNavigator> {
 
   final List<Widget> _screens = const [
     VacantesScreen(),
-    PostulacionesScreen(),
-    MatchesScreen(),
-    ExplorarScreen(),
+    PostulacionesCandidatoScreen(),
+    MatchesCandidatoScreen(),
+    ExplorarCandidatoScreen(),
     VacantesScreen(), // Placeholder para Perfil
   ];
 

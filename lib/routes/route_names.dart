@@ -1,10 +1,16 @@
 class RouteNames {
   static const String loading = '/';
-  static const String access = '/access';
-  static const String home = '/home';
-  static const String vacantes = '/vacantes';
-  static const String postulaciones = '/postulaciones';
-  static const String matches = '/matches';
-  static const String explorar = '/explorar';
-  static const String perfil = '/perfil';
+  static const String login = '/login';
+  static const String register = '/register';
+
+  // Candidato
+  static const String homeCandidato = '/home-candidato';
+  static const String postulacionesCandidato = '/postulaciones-candidato';
+  static const String matchesCandidato = '/matches-candidato';
+  static const String explorarCandidato = '/explorar-candidato';
+
+  // Empresa
+  static const String homeEmpresa = '/home-empresa';
+  static const String matchesEmpresa = '/matches-empresa';
+  static const String explorarEmpresa = '/explorar-empresa';
 }

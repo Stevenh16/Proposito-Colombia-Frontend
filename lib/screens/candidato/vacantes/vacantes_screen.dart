@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../widgets/cards/vacancy_card.dart';
+
+import '../../../widgets/cards/vacancy_card.dart';
 
 class VacantesScreen extends StatelessWidget {
   const VacantesScreen({super.key});
