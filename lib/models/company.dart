@@ -1,11 +1,12 @@
 import 'dart:convert';
 
+import 'package:swallow_app/models/company_type.dart';
 import 'package:swallow_app/models/interest.dart';
 import 'package:swallow_app/models/user_role_company.dart';
 
 class Company {
   final int id;
-  final int idTipoEmpresa;
+  final CompanyType tipoEmpresa;
   final String nombreEmpresa;
   final String direccionEmpresa;
   final String telefonoEmpresa;
@@ -14,7 +15,7 @@ class Company {
 
   Company({
     required this.id,
-    required this.idTipoEmpresa,
+    required this.tipoEmpresa,
     required this.nombreEmpresa,
     required this.direccionEmpresa,
     required this.telefonoEmpresa,
@@ -22,7 +23,7 @@ class Company {
     required this.relUsuarioEmpresa,
   });
 
-  factory Company.fromJson(Map<String, dynamic> json){
+  /*factory Company.fromJson(Map<String, dynamic> json){
     return Company(
       id: json['id'] ?? 0,
       idTipoEmpresa: json['idTipoEmpresa'] ?? 0,
@@ -34,5 +35,5 @@ class Company {
       relUsuarioEmpresa: (jsonDecode(json['relUsuarioEmpresa']) as List<dynamic>).map((req) => UserRoleCompany.fromJson(req))
           .toList(),
     );
-  }
+  }*/
 }

@@ -7,4 +7,5 @@ class RouteNames {
   static const String matches = '/matches';
   static const String explorar = '/explorar';
   static const String perfil = '/perfil';
+  static const vacanteCardView = '/vacanteCardView';
 }

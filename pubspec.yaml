@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.1.0
 
   # UI & Icons
   cupertino_icons: ^1.0.8
@@ -45,6 +46,7 @@ flutter:
     - assets/images/logo_nombre.png
     - assets/images/LogoPropoL_Negro.png
     - assets/images/from_md.png
+    - assets/icons/
 
   # Fonts
   fonts:

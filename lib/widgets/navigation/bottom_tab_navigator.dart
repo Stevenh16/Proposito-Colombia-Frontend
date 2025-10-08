@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:swallow_app/screens/vacantes/widgets/vacante_card.dart';
 
 import '../../screens/explorar/explorar_screen.dart';
 import '../../screens/matches/matches_screen.dart';
 import '../../screens/postulaciones/postulaciones_screen.dart';
-import '../../screens/vacantes/vacantes_screen.dart';
+
 
 class BottomTabNavigator extends StatefulWidget {
   const BottomTabNavigator({super.key});
@@ -16,11 +17,12 @@ class _BottomTabNavigatorState extends State<BottomTabNavigator> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-    VacantesScreen(),
+    VacanteCardView(),
     PostulacionesScreen(),
     MatchesScreen(),
     ExplorarScreen(),
-    VacantesScreen(), // Placeholder para Perfil
+    VacanteCardView(),
+    //VacantesScreen(), // Placeholder para Perfil
   ];
 
   @override
@@ -47,7 +49,7 @@ class _BottomTabNavigatorState extends State<BottomTabNavigator> {
           unselectedItemColor: theme.textTheme.bodyMedium?.color,
           selectedFontSize: 12,
           unselectedFontSize: 12,
-          items: const [
+          items: const[
             BottomNavigationBarItem(
               icon: Icon(Icons.home),
               label: 'Inicio',

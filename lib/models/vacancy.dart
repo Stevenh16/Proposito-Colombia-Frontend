@@ -37,7 +37,7 @@ class Vacancy {
     required this.relUsuarioEmpresaId,
   });
 
-  factory Vacancy.fromJson(Map<String, dynamic> json){
+  /*factory Vacancy.fromJson(Map<String, dynamic> json){
     return Vacancy(
       id: json['id'] ?? 0,
       idUbicacion: json['idUbicacion'] ?? 0,
@@ -55,5 +55,5 @@ class Vacancy {
       idPeriodicidad: json['idPeriodicidad'] ?? 0,
       relUsuarioEmpresaId: UserRoleCompanyId.fromJson(json['relUsuarioEmpresaId']),
     );
-  }
+  }*/
 }

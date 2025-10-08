@@ -9,10 +9,10 @@ class Interest {
     required this.tipoInteres,
   });
 
-  factory Interest.fromJson(Map<String, dynamic> json){
+  /*factory Interest.fromJson(Map<String, dynamic> json){
     return Interest(
       id: InterestId.fromJson(json['id']),
       tipoInteres: json['tipoInteres'],
     );
-  }
+  }*/
 }

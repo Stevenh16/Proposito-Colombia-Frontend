@@ -9,10 +9,10 @@ class UserRoleCompany {
     required this.permisoRelUsuarioEmpresa,
   });
 
-  factory UserRoleCompany.fromJson(Map<String, dynamic> json){
+  /*factory UserRoleCompany.fromJson(Map<String, dynamic> json){
     return UserRoleCompany(
       id: UserRoleCompanyId.fromJson(json['id']),
       permisoRelUsuarioEmpresa: json['permisoRelUsuarioEmpresa'] ?? 0,
     );
-  }
+  }*/
 }

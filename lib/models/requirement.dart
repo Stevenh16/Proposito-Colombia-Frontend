@@ -1,19 +1,21 @@
+import 'package:swallow_app/models/vacancy.dart';
+
 class Requirement {
   final int id;
-  final int idVacante;
+  final Vacancy vacante;
   final String tituloRequisito;
   final String detalleRequisito;
   final int ordenRequisito;
 
   Requirement({
     required this.id,
-    required this.idVacante,
+    required this.vacante,
     required this.tituloRequisito,
     required this.detalleRequisito,
     required this.ordenRequisito,
   });
 
-  factory Requirement.fromJson(Map<String, dynamic> json){
+  /*factory Requirement.fromJson(Map<String, dynamic> json){
     return Requirement(
       id: json['id'] ?? 0,
       idVacante: json['idVacante'] ?? 0,
@@ -21,5 +23,5 @@ class Requirement {
       detalleRequisito: json['detalleRequisito'] ?? '',
       ordenRequisito: json['ordenRequisito'] ?? 0,
     );
-  }
+  }*/
 }
