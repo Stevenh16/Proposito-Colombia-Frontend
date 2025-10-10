@@ -1,3 +1,4 @@
+import 'session_manager.dart';
 import 'dart:convert';
 import 'package:swallow_app/models/history_status_vacant.dart';
 import 'package:http/http.dart' as http;
@@ -20,12 +21,12 @@ class HistoryStatusVacantService {
 
   static Future<HistoryStatusVacant> getById(int id) async {
     final url = Uri.parse("$baseUrl/$id");
-    final response = await http.get(
-      url,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    );
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(url, headers: headers);
     if (response.statusCode == 200) {
       final dto = HistoryStatusVacantDto.fromJson(jsonDecode(response.body)['datos']);
       return await HistoryStatusVacantService()._mapDtoToModel(dto);
@@ -35,8 +36,12 @@ class HistoryStatusVacantService {
   }
 
   Future<List<HistoryStatusVacant>> getByVacanteId(int vacanteId) async {
-    final response = await http.get(Uri.parse('$baseUrl/vacante/$vacanteId'));
-
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse('$baseUrl/vacante/$vacanteId'), headers: headers);
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       final List<dynamic> list = data['datos'] ?? [];
@@ -52,9 +57,14 @@ class HistoryStatusVacantService {
   }
 
   Future<HistoryStatusVacant> deleteHistorial(HistoryStatusVacant history) async {
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
     final response = await http.delete(
       Uri.parse('$baseUrl/historial-estado-vacante/${history.id}'),
-      headers: {'Content-Type': 'application/json'},
+      headers: headers,
       body: json.encode({
         "id": history.id,
         "idVacante": history.vacante.id,

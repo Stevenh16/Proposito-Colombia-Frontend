@@ -4,12 +4,20 @@ import 'package:swallow_app/dtos/location_dto.dart';
 import 'package:swallow_app/models/location.dart';
 import '../dtos/user_dto.dart';
 import '../models/user.dart';
+import 'package:swallow_app/services/session_manager.dart';
 
 class UserService {
   final String baseUrl = 'http://localhost:3210/api/usuario'; // Cambia por tu URL real
 
   Future<List<User>> getAllUsuarios() async {
-    final response = await http.get(Uri.parse(baseUrl));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse(baseUrl),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> usuariosJson = data['datos'] ?? [];
@@ -21,7 +29,14 @@ class UserService {
   }
 
   Future<User> getUsuario(int idUsuario) async {
-    final response = await http.get(Uri.parse('$baseUrl/id/$idUsuario'));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/id/$idUsuario'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final dto = UserDto.fromJson(data['datos']);
@@ -32,9 +47,13 @@ class UserService {
   }
 
   Future<User> createUsuario(Map<String, dynamic> usuarioRequest) async {
+    final token = await SessionManager.getToken();
     final response = await http.post(
       Uri.parse(baseUrl),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode(usuarioRequest),
     );
     if (response.statusCode == 200) {
@@ -47,7 +66,14 @@ class UserService {
   }
 
   Future<List<User>> buscarUsuariosPorNombre(String nombre) async {
-    final response = await http.get(Uri.parse('$baseUrl/buscar?nombre=$nombre'));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/buscar?nombre=$nombre'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> usuariosJson = data['datos'] ?? [];
@@ -59,9 +85,13 @@ class UserService {
   }
 
   Future<User> updateUsuario(int id, Map<String, dynamic> usuarioRequest) async {
+    final token = await SessionManager.getToken();
     final response = await http.put(
       Uri.parse('$baseUrl/$id'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode(usuarioRequest),
     );
     if (response.statusCode == 200) {
@@ -74,7 +104,14 @@ class UserService {
   }
 
   Future<bool> deleteUsuario(int id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/$id'));
+    final token = await SessionManager.getToken();
+    final response = await http.delete(
+      Uri.parse('$baseUrl/$id'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       return true;
     } else {
@@ -83,7 +120,14 @@ class UserService {
   }
 
   Future<List<User>> buscarUsuariosPorTipoDocumento(int tipo) async {
-    final response = await http.get(Uri.parse('$baseUrl/tipo/$tipo'));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse('$baseUrl/tipo/$tipo'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> usuariosJson = data['datos'] ?? [];

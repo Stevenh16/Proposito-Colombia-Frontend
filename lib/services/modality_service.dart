@@ -1,3 +1,4 @@
+import 'session_manager.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../dtos/modality_dto.dart';
@@ -7,7 +8,12 @@ class ModalityService {
   final String baseUrl = 'http://localhost:3210/modalidades';
 
   Future<Modality> getModalityById(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/obtener/$id'));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse('$baseUrl/obtener/$id'), headers: headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final dto = ModalityDto.fromJson(data['datos']);
@@ -18,7 +24,12 @@ class ModalityService {
   }
 
   Future<List<Modality>> getModalities() async {
-    final response = await http.get(Uri.parse('$baseUrl/obtener/todos'));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse('$baseUrl/obtener/todos'), headers: headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> modalidadesJson = data['datos'] ?? [];

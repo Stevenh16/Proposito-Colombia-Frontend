@@ -1,14 +1,19 @@
+import 'session_manager.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../dtos/frequency_dto.dart';
 import '../models/frequency.dart';
-import '../models/api_response.dart';
 
 class FrequencyService {
-  static const String baseUrl = "http://localhost:3210/periodicidadPago";
+  static const String baseUrl = "http://localhost:3210/periodicidades-pago";
 
   Future<Frequency> getFrequencyById(int id) async {
-    final response = await http.get(Uri.parse("$baseUrl/obtener/$id"));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse("$baseUrl/obtener/$id"), headers: headers);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
       final dto = FrequencyDto.fromJson(jsonData['datos']);
@@ -19,7 +24,12 @@ class FrequencyService {
   }
 
   Future<List<Frequency>> getAllFrequencies() async {
-    final response = await http.get(Uri.parse("$baseUrl/obtener/todos"));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse("$baseUrl/obtener/todos"), headers: headers);
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
       final List<dynamic> list = jsonData['datos'] ?? [];

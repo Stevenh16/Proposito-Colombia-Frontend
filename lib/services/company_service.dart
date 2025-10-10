@@ -1,6 +1,7 @@
 import 'package:swallow_app/models/api_response.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:swallow_app/services/session_manager.dart';
 
 import 'package:swallow_app/models/company.dart';
 import 'package:swallow_app/models/page.dart';
@@ -13,11 +14,13 @@ class CompanyService {
   static const String baseUrl = "http://localhost:3210/empresas";
 
   static Future<int> getCantidadEmpresas() async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/cantidad");
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if(response.statusCode==200){
@@ -28,11 +31,13 @@ class CompanyService {
   }
 
   static Future<List<Company>> getAllEmpresas() async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse(baseUrl);
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -54,12 +59,14 @@ class CompanyService {
     int page = 0,
     int size = 10,
   }) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/buscar?filtro=$filtro&page=$page&size=$size");
 
     final response = await http.get(
       url,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
       },
     );
 
@@ -89,11 +96,13 @@ class CompanyService {
   }
 
   static Future<Company> createEmpresa(Company company) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse(baseUrl);
     final response = await http.post(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         "id": company.id,
@@ -126,11 +135,13 @@ class CompanyService {
   }
 
   static Future<Company> updateEmpresa(Company company, int id) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/$id");
     final response = await http.put(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         "id": company.id,
@@ -163,11 +174,13 @@ class CompanyService {
   }
 
   static Future<Company> deleteEmpresa(Company company) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse(baseUrl);
     final response = await http.delete(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
       body: jsonEncode({
         "id": company.id,
@@ -201,11 +214,13 @@ class CompanyService {
   }
 
   static Future<List<Company>> getEmpresasByTipoEmpresa(int tipoEmpresaId) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/tipo/$tipoEmpresaId");
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -234,11 +249,13 @@ class CompanyService {
   }
 
   static Future<Company> getEmpresaById(int id) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/obtener/$id");
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {

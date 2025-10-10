@@ -6,12 +6,19 @@ import 'package:swallow_app/models/api_response.dart';
 import 'package:swallow_app/models/user_role_company.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:swallow_app/services/session_manager.dart';
 
 class UserRoleCompanyService {
   static const String baseUrl = "http://localhost:3210/relUsuarioEmpresa";
 
   Future<List<UserRoleCompany>> getAllUsuariosEmpresas() async {
-    final response = await http.get(Uri.parse(baseUrl));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse(baseUrl),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -28,7 +35,13 @@ class UserRoleCompanyService {
   }
 
   Future<UserRoleCompany> getByUsuarioId(int usuarioId) async {
-    final response = await http.get(Uri.parse("$baseUrl/usuario/$usuarioId"));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse("$baseUrl/usuario/$usuarioId"),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -43,7 +56,13 @@ class UserRoleCompanyService {
   }
 
   Future<UserRoleCompany?> getByEmpresaId(int empresaId) async {
-    final response = await http.get(Uri.parse("$baseUrl/empresa/$empresaId"));
+    final token = await SessionManager.getToken();
+    final response = await http.get(
+      Uri.parse("$baseUrl/empresa/$empresaId"),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
@@ -58,9 +77,13 @@ class UserRoleCompanyService {
   }
 
   Future<UserRoleCompany> createRelUsuarioEmpresa(UserRoleCompany dto) async {
+    final token = await SessionManager.getToken();
     final response = await http.post(
       Uri.parse(baseUrl),
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
+      },
       body: jsonEncode({
         "id": dto.id,
         "permisoRelUsuarioEmpresa": dto.permisoRelUsuarioEmpresa,
@@ -81,8 +104,12 @@ class UserRoleCompanyService {
 
   Future<bool> deleteByUsuarioAndEmpresa(
       int usuarioId, int empresaId) async {
+    final token = await SessionManager.getToken();
     final response = await http.delete(
       Uri.parse("$baseUrl/usuario/$usuarioId/empresa/$empresaId"),
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
     );
 
     if (response.statusCode == 204 || response.statusCode == 200) {

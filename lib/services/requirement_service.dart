@@ -102,6 +102,21 @@ class RequirementService {
     }
   }
 
+  Future<Requirement> getRequisitoById(int id) async {
+    final response = await http.get(Uri.parse("$baseUrl/obtener/$id"));
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final apiResponse = ApiResponse.fromJson(
+        jsonData,
+        (data) => RequirementDto.fromJson(data),
+      );
+      return _mapDtoToModel(apiResponse.datos);
+    } else {
+      throw Exception("Error al obtener el requisito: ${response.body}");
+    }
+  }
+
   Future<Requirement> _mapDtoToModel(RequirementDto dto) async {
     final vacante = await VacancyService().getVacanteById(dto.idVacante);
     return Requirement(

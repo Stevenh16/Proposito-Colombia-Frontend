@@ -1,3 +1,4 @@
+import 'session_manager.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../dtos/location_dto.dart';
@@ -7,7 +8,12 @@ class LocationService {
   final String baseUrl = 'http://localhost:3210/api/ubicacion';
 
   Future<List<Location>> getUbicaciones() async {
-    final response = await http.get(Uri.parse(baseUrl));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse(baseUrl), headers: headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> ubicacionesJson = data['datos'] ?? [];
@@ -19,7 +25,12 @@ class LocationService {
   }
 
   Future<List<Location>> buscarUbicaciones(String nombre) async {
-    final response = await http.get(Uri.parse('$baseUrl/buscar?nombre=$nombre'));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse('$baseUrl/buscar?nombre=$nombre'), headers: headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final List<dynamic> ubicacionesJson = data['datos'] ?? [];
@@ -31,7 +42,12 @@ class LocationService {
   }
 
   Future<Location> getUbicacionById(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/$id'));
+    final token = await SessionManager.getToken();
+    final headers = {
+      "Content-Type": "application/json",
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
+    final response = await http.get(Uri.parse('$baseUrl/$id'), headers: headers);
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final dto = LocationDto.fromJson(data['datos'] ?? {});

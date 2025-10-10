@@ -1,19 +1,20 @@
 import 'dart:typed_data';
-
 import 'package:swallow_app/dtos/advertisement_dto.dart';
 import 'package:swallow_app/models/advertisement.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:swallow_app/services/vacancy_service.dart';
+import 'package:swallow_app/services/session_manager.dart';
 
 class AdvertisementService {
   static const String baseUrl = "http://localhost:3210/anuncios";
 
   static Future<Advertisement> create(int idVacante, http.MultipartFile file) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse(baseUrl);
     var headers = {
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
     };
     var request = http.MultipartRequest('POST', url);
     request.headers.addAll(headers);
@@ -29,9 +30,11 @@ class AdvertisementService {
   }
 
   static Future<Advertisement> update(int id, http.MultipartFile file) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/$id/imagen");
     var headers = {
       'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
     };
     var request = http.MultipartRequest('PUT', url);
     request.headers.addAll(headers);
@@ -46,22 +49,26 @@ class AdvertisementService {
   }
 
   static Future<int> delete(int id) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/$id");
     final response = await http.delete(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     return jsonDecode(response.body)['data'] as int;
   }
 
   static Future<Advertisement> findById(int id) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/$id");
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -73,11 +80,13 @@ class AdvertisementService {
   }
 
   static Future<List<Advertisement>> findAll() async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse(baseUrl);
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -94,11 +103,13 @@ class AdvertisementService {
   }
 
   static Future<Advertisement> findByVacanteId(int vacanteId) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/vacante/$vacanteId");
     final response = await http.get(
       url,
       headers: {
         "Content-Type": "application/json",
+        'Authorization': 'Bearer $token',
       },
     );
     if (response.statusCode == 200) {
@@ -110,9 +121,14 @@ class AdvertisementService {
   }
 
   static Future<Uint8List?> obtenerImagen(int id) async {
+    final token = await SessionManager.getToken();
     final url = Uri.parse("$baseUrl/$id/imagen");
-    final response = await http.get(url);
-
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
     if (response.statusCode == 200) {
       return response.bodyBytes;
     } else {
