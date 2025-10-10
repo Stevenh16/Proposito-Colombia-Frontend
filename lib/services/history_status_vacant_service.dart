@@ -1,9 +1,21 @@
 import 'dart:convert';
-import 'package:swallow_app/models/api_response.dart';
 import 'package:swallow_app/models/history_status_vacant.dart';
 import 'package:http/http.dart' as http;
+import '../dtos/history_status_vacant_dto.dart';
+import '../services/vacancy_service.dart';
+import '../services/status_vacant_service.dart';
 
 class HistoryStatusVacantService {
+  Future<HistoryStatusVacant> _mapDtoToModel(HistoryStatusVacantDto dto) async {
+    final vacante = await VacancyService().getVacanteById(dto.idVacante);
+    final estadoVacante = await StatusVacantService.getStatusVacantById(dto.idEstadoVacante);
+    return HistoryStatusVacant(
+      id: dto.id,
+      vacante: vacante,
+      estadoVacante: estadoVacante,
+      fechaHistorialEstadoVacante: DateTime.parse(dto.fechaHistorialEstadoVacante),
+    );
+  }
   static const String baseUrl = "http://localhost:3210/historialEstadosVacantes";
 
   static Future<HistoryStatusVacant> getById(int id) async {
@@ -14,8 +26,9 @@ class HistoryStatusVacantService {
         "Content-Type": "application/json",
       },
     );
-    if(response.statusCode==200){
-      return ApiResponse<HistoryStatusVacant>.fromJson(jsonDecode(response.body),(data) => HistoryStatusVacant.fromJson(data)).datos;
+    if (response.statusCode == 200) {
+      final dto = HistoryStatusVacantDto.fromJson(jsonDecode(response.body)['datos']);
+      return await HistoryStatusVacantService()._mapDtoToModel(dto);
     } else {
       throw Exception("Error al obtener empresa por id tipo empresa: ${response.body}");
     }
@@ -25,13 +38,14 @@ class HistoryStatusVacantService {
     final response = await http.get(Uri.parse('$baseUrl/vacante/$vacanteId'));
 
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return ApiResponse.fromJson(
-        jsonData,
-        (data) => (data as List)
-            .map((item) => HistoryStatusVacant.fromJson(item))
-            .toList(),
-      ).datos;
+      final data = json.decode(response.body);
+      final List<dynamic> list = data['datos'] ?? [];
+      List<HistoryStatusVacant> result = [];
+      for (var item in list) {
+        final dto = HistoryStatusVacantDto.fromJson(item);
+        result.add(await _mapDtoToModel(dto));
+      }
+      return result;
     } else {
       throw Exception('Error al obtener historial por id de vacante');
     }
@@ -43,18 +57,16 @@ class HistoryStatusVacantService {
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         "id": history.id,
-        "idVacante": history.idVacante,
-        "idEstadoVacante": history.idEstadoVacante,
+        "idVacante": history.vacante.id,
+        "idEstadoVacante": history.estadoVacante.id,
         "fechaHistorialEstadoVacante": history.fechaHistorialEstadoVacante,
       }),
     );
 
     if (response.statusCode == 200) {
-      final jsonData = json.decode(response.body);
-      return ApiResponse.fromJson(
-        jsonData,
-        (data) => HistoryStatusVacant.fromJson(data),
-      ).datos;
+      final data = json.decode(response.body);
+      final dto = HistoryStatusVacantDto.fromJson(data['datos']);
+      return await _mapDtoToModel(dto);
     } else {
       throw Exception('Error al eliminar historial');
     }

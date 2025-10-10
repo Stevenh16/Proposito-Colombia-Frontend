@@ -56,4 +56,19 @@ class StatusVacantService {
       throw Exception("Error al actualizar Empresa numero ${response.statusCode}: ${response.body}");
     }
   }
+
+  static Future<StatusVacant> getStatusVacantById(int id) async {
+    final url = Uri.parse("$baseUrl/obtener/$id");
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+    if (response.statusCode == 200) {
+      return ApiResponse<StatusVacant>.fromJson(jsonDecode(response.body), (d) => StatusVacant.fromJson(d)).datos;
+    } else {
+      throw Exception("Error al obtener estado vacante por id: ${response.body}");
+    }
+  }
 }

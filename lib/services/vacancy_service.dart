@@ -1,3 +1,14 @@
+import '../dtos/vacancy_dto.dart';
+import '../dtos/user_role_company_id_dto.dart';
+import '../services/location_service.dart';
+import '../services/keyword_service.dart';
+import '../services/requirement_service.dart';
+import '../services/salary_range_service.dart';
+import '../services/journey_service.dart';
+import '../services/modality_service.dart';
+import '../services/contract_service.dart';
+import '../services/frequency_service.dart';
+import '../services/user_role_company_service.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:swallow_app/models/api_response.dart';
@@ -13,9 +24,9 @@ class VacancyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => (data as List).map((e) => Vacancy.fromJson(e)).toList(),
+        (data) => (data as List).map((e) => VacancyDto.fromJson(e)).toList(),
       );
-      return apiResponse.datos;
+      return Future.wait(apiResponse.datos.map((dto) => _mapDtoToModel(dto)));
     } else {
       throw Exception("Error al obtener las vacantes: ${response.statusCode}");
     }
@@ -26,8 +37,8 @@ class VacancyService {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      final apiResponse = ApiResponse.fromJson(jsonData, (data) => Vacancy.fromJson(data));
-      return apiResponse.datos;
+      final apiResponse = ApiResponse.fromJson(jsonData, (data) => VacancyDto.fromJson(data));
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al obtener la vacante con id $id: ${response.statusCode}");
     }
@@ -58,8 +69,8 @@ class VacancyService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);
-      final apiResponse = ApiResponse.fromJson(jsonData, (data) => Vacancy.fromJson(data));
-      return apiResponse.datos;
+      final apiResponse = ApiResponse.fromJson(jsonData, (data) => VacancyDto.fromJson(data));
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al crear la vacante: ${response.statusCode}");
     }
@@ -90,8 +101,8 @@ class VacancyService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonData = jsonDecode(response.body);
-      final apiResponse = ApiResponse.fromJson(jsonData, (data) => Vacancy.fromJson(data));
-      return apiResponse.datos;
+      final apiResponse = ApiResponse.fromJson(jsonData, (data) => VacancyDto.fromJson(data));
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al actualizar la vacante con id $id: ${response.statusCode}");
     }
@@ -116,9 +127,9 @@ class VacancyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => (data as List).map((e) => Vacancy.fromJson(e)).toList(),
+        (data) => (data as List).map((e) => VacancyDto.fromJson(e)).toList(),
       );
-      return apiResponse.datos;
+      return Future.wait(apiResponse.datos.map((dto) => _mapDtoToModel(dto)));
     } else {
       throw Exception("Error al obtener las vacantes de la empresa $empresaId: ${response.statusCode}");
     }
@@ -131,9 +142,9 @@ class VacancyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => (data as List).map((e) => Vacancy.fromJson(e)).toList(),
+        (data) => (data as List).map((e) => VacancyDto.fromJson(e)).toList(),
       );
-      return apiResponse.datos;
+      return Future.wait(apiResponse.datos.map((dto) => _mapDtoToModel(dto)));
     } else {
       throw Exception("Error al obtener vacantes del usuario $idUsuario en empresa $idEmpresa: ${response.statusCode}");
     }
@@ -149,5 +160,34 @@ class VacancyService {
     } else {
       throw Exception("Error al obtener los días publicados para la vacante $id: ${response.statusCode}");
     }
+  }
+
+  Future<Vacancy> _mapDtoToModel(VacancyDto dto) async {
+    final location = await LocationService().getUbicacionById(dto.idUbicacion);
+    final keywords = await Future.wait(dto.palabrasClaveIds.map((id) => KeywordService().getPalabraClaveById(id)));
+    final requirements = await Future.wait(dto.requisitoIds.map((id) => RequirementService().getRequisitoById(id)));
+    final salaryRange = await SalaryRangeService().getSalaryRangeById(dto.idRangoSalarial);
+    final journey = await JourneyService().getJornadaById(dto.idJornada);
+    final modality = await ModalityService().getModalityById(dto.idModalidad);
+    final contract = await ContractService().getContratoPorId(dto.idContrato);
+    final frequency = await FrequencyService().getFrequencyById(dto.idPeriodicidad);
+    final userRoleCompany = await UserRoleCompanyService().getByUsuarioId(dto.relUsuarioEmpresaId.idUsuario);
+    return Vacancy(
+      id: dto.id,
+      idUbicacion: location,
+      tituloVacante: dto.tituloVacante,
+      descripcionCorta: dto.descripcionCorta,
+      fechaInicioVacante: DateTime.parse(dto.fechaInicioVacante),
+      fechaFinVacante: DateTime.parse(dto.fechaFinVacante),
+      estadoVacante: dto.estadoVacante,
+      palabrasClaveIds: keywords,
+      requisitoIds: requirements,
+      idRangoSalarial: salaryRange,
+      idJornada: journey,
+      idModalidad: modality,
+      idContrato: contract,
+      idPeriodicidad: frequency,
+      relUsuarioEmpresaId: userRoleCompany.id,
+    );
   }
 }

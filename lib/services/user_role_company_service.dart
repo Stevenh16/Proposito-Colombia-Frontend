@@ -1,3 +1,7 @@
+import 'package:swallow_app/models/user_role_company_id.dart';
+import '../dtos/user_role_company_dto.dart';
+import '../services/user_service.dart';
+import '../services/company_service.dart';
 import 'package:swallow_app/models/api_response.dart';
 import 'package:swallow_app/models/user_role_company.dart';
 import 'dart:convert';
@@ -14,10 +18,10 @@ class UserRoleCompanyService {
       final apiResponse = ApiResponse.fromJson(
         jsonData,
         (data) => (data as List)
-            .map((e) => UserRoleCompany.fromJson(e))
+            .map((e) => UserRoleCompanyDto.fromJson(e))
             .toList(),
       );
-      return apiResponse.datos;
+      return Future.wait(apiResponse.datos.map((dto) => _mapDtoToModel(dto)));
     } else {
       throw Exception("Error al obtener las relaciones usuario-empresa");
     }
@@ -30,9 +34,9 @@ class UserRoleCompanyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => UserRoleCompany.fromJson(data),
+        (data) => UserRoleCompanyDto.fromJson(data),
       );
-      return apiResponse.datos;
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al obtener la relación por usuarioId");
     }
@@ -45,9 +49,9 @@ class UserRoleCompanyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => UserRoleCompany.fromJson(data),
+        (data) => UserRoleCompanyDto.fromJson(data),
       );
-      return apiResponse.datos;
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al obtener la relación por empresaId");
     }
@@ -67,9 +71,9 @@ class UserRoleCompanyService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => UserRoleCompany.fromJson(data),
+        (data) => UserRoleCompanyDto.fromJson(data),
       );
-      return apiResponse.datos;
+      return _mapDtoToModel(apiResponse.datos);
     } else {
       throw Exception("Error al crear la relación usuario-empresa");
     }
@@ -86,5 +90,17 @@ class UserRoleCompanyService {
     } else {
       throw Exception("Error al eliminar la relación usuario-empresa");
     }
+  }
+
+  Future<UserRoleCompany> _mapDtoToModel(UserRoleCompanyDto dto) async {
+    final usuario = await UserService().getUsuario(dto.id.idUsuario);
+    final empresa = await CompanyService.getEmpresaById(dto.id.idEmpresa);
+    return UserRoleCompany(
+      id: UserRoleCompanyId(
+        usuario: usuario,
+        empresa: empresa,
+      ),
+      permisoRelUsuarioEmpresa: dto.permisoRelUsuarioEmpresa,
+    );
   }
 }

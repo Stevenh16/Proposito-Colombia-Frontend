@@ -1,9 +1,22 @@
+import '../services/user_service.dart';
+import '../services/vacancy_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:swallow_app/dtos/keyword_dto.dart';
 import 'package:swallow_app/models/api_response.dart';
 import 'package:swallow_app/models/keyword.dart';
 import 'dart:convert';
 
 class KeywordService {
+  Future<Keyword> _mapDtoToModel(KeywordDto dto) async {
+    final usuarios = await Future.wait(dto.usuarioIds.map((id) => UserService().getUsuario(id)));
+    final vacantes = await Future.wait(dto.vacanteIds.map((id) => VacancyService().getVacanteById(id)));
+    return Keyword(
+      id: dto.id,
+      textoPalabraClave: dto.textoPalabraClave,
+      usuarios: usuarios,
+      vacantes: vacantes,
+    );
+  }
   static const String baseUrl = "http://localhost:3210/palabrasClave";
 
   Future<List<Keyword>> getAllPalabrasClaves() async {
@@ -14,7 +27,7 @@ class KeywordService {
       final apiResponse = ApiResponse.fromJson(
         jsonData,
         (data) => (data as List)
-            .map((item) => Keyword.fromJson(item))
+            .map((item) => KeywordDto.fromJson(item))
             .toList(),
       );
       return apiResponse.datos;
@@ -30,7 +43,7 @@ class KeywordService {
       final jsonData = jsonDecode(response.body);
       final apiResponse = ApiResponse.fromJson(
         jsonData,
-        (data) => Keyword.fromJson(data),
+        (data) => KeywordDto.fromJson(data),
       );
       return apiResponse.datos;
     } else {
@@ -46,4 +59,6 @@ class KeywordService {
       throw Exception('Error al eliminar la palabra clave');
     }
   }
+
+  
 }

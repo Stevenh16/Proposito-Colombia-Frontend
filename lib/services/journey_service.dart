@@ -7,7 +7,7 @@ import 'package:swallow_app/models/journey.dart';
 class JourneyService {
   static const String baseUrl = "http://localhost:3210/Jornadas";
 
-  static Future<Journey> createJornada(Journey jornada) async {
+  Future<Journey> createJornada(Journey jornada) async {
     final url = Uri.parse(baseUrl);
 
     final response = await http.post(
@@ -33,7 +33,7 @@ class JourneyService {
     }
   }
 
-  static Future<Journey> updateJornada(Journey jornada) async {
+  Future<Journey> updateJornada(Journey jornada) async {
     final url = Uri.parse(baseUrl);
 
     final response = await http.put(
@@ -59,7 +59,7 @@ class JourneyService {
     }
   }
 
-  static Future<int> deleteJornada(int id) async {
+  Future<int> deleteJornada(int id) async {
     final url = Uri.parse("$baseUrl/$id");
 
     final response = await http.delete(
@@ -77,6 +77,28 @@ class JourneyService {
     } else {
       throw Exception(
         "Error al eliminar jornada (${response.statusCode}): ${response.body}",
+      );
+    }
+  }
+
+  Future<Journey> getJornadaById(int id) async {
+    final url = Uri.parse("$baseUrl/obtener/$id");
+
+    final response = await http.get(
+      url,
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (response.statusCode == 200) {
+      final jsonMap = jsonDecode(response.body);
+      final apiResponse = ApiResponse<Journey>.fromJson(
+        jsonMap,
+        (data) => Journey.fromJson(data),
+      );
+      return apiResponse.datos;
+    } else {
+      throw Exception(
+        "Error al obtener la jornada (${response.statusCode}): ${response.body}",
       );
     }
   }

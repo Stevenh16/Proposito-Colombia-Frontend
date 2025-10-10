@@ -4,6 +4,10 @@ import 'dart:convert';
 
 import 'package:swallow_app/models/company.dart';
 import 'package:swallow_app/models/page.dart';
+import '../dtos/company_dto.dart';
+import '../services/company_type_service.dart';
+import '../services/interest_service.dart';
+import '../services/user_role_company_service.dart';
 
 class CompanyService {
   static const String baseUrl = "http://localhost:3210/empresas";
@@ -31,8 +35,15 @@ class CompanyService {
         "Content-Type": "application/json",
       },
     );
-    if(response.statusCode==200){
-      return ApiResponse<List<Company>>.fromJson(jsonDecode(response.body),(data) => (data as List).map((e) => Company.fromJson(e)).toList()).datos;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> empresasJson = data['datos'] ?? [];
+      List<Company> empresas = [];
+      for (var item in empresasJson) {
+        final dto = CompanyDto.fromJson(item);
+        empresas.add(await mapDtoToModel(dto));
+      }
+      return empresas;
     } else {
       throw Exception("Error al listar las empresas: ${response.body}");
     }
@@ -54,14 +65,22 @@ class CompanyService {
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> jsonMap = jsonDecode(response.body);
-      final apiResponse = ApiResponse<Page<Company>>.fromJson(
+      final apiResponse = ApiResponse<Page<CompanyDto>>.fromJson(
         jsonMap,
         (datosJson) => Page.fromJson(
           datosJson,
-          (empresaJson) => Company.fromJson(empresaJson),
+          (empresaJson) => CompanyDto.fromJson(empresaJson),
         ),
       );
-      return apiResponse.datos;
+      // Mapeo de cada CompanyDto a Company
+      final items = await Future.wait(apiResponse.datos.content.map((dto) => mapDtoToModel(dto)));
+      return Page<Company>(
+        content: items,
+        totalElements: apiResponse.datos.totalElements,
+        totalPages: apiResponse.datos.totalPages,
+        number: apiResponse.datos.number,
+        size: apiResponse.datos.size,
+      );
     } else {
       throw Exception(
         "Error ${response.statusCode}: ${response.body}",
@@ -78,16 +97,29 @@ class CompanyService {
       },
       body: jsonEncode({
         "id": company.id,
-        "idTipoEmpresa": company.idTipoEmpresa,
+        "idTipoEmpresa": company.tipoEmpresa.id,
         "nombreEmpresa": company.nombreEmpresa,
         "direccionEmpresa": company.direccionEmpresa,
         "telefonoEmpresa": company.telefonoEmpresa,
-        "interes": company.interes,
-        "relUsuarioEmpresa": company.relUsuarioEmpresa,
+        "interes": company.interes.map((i) => i.id).toList(),
+        "relUsuarioEmpresa": company.relUsuarioEmpresa.map((r) => r.id.usuario).toList(),
       }),
     );
-    if(response.statusCode==200){
-      return ApiResponse<Company>.fromJson(jsonDecode(response.body), (d)=> Company.fromJson(d)).datos;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final dto = CompanyDto.fromJson(data['datos']);
+      final tipoEmpresa = await CompanyTypeService().getTipoEmpresaById(dto.idTipoEmpresa);
+      final interes = await Future.wait(dto.interes.map((i) => InterestService().getInteresById(i.id)));
+      final relUsuarioEmpresa = await Future.wait(dto.relUsuarioEmpresa.map((r) => UserRoleCompanyService().getByUsuarioId(r.id.idUsuario)));
+      return Company(
+        id: dto.id,
+        tipoEmpresa: tipoEmpresa,
+        nombreEmpresa: dto.nombreEmpresa,
+        direccionEmpresa: dto.direccionEmpresa,
+        telefonoEmpresa: dto.telefonoEmpresa,
+        interes: interes,
+        relUsuarioEmpresa: relUsuarioEmpresa,
+      );
     } else {
       throw Exception("Error al crear Empresa numero ${response.statusCode}: ${response.body}");
     }
@@ -102,16 +134,29 @@ class CompanyService {
       },
       body: jsonEncode({
         "id": company.id,
-        "idTipoEmpresa": company.idTipoEmpresa,
+        "idTipoEmpresa": company.tipoEmpresa.id,
         "nombreEmpresa": company.nombreEmpresa,
         "direccionEmpresa": company.direccionEmpresa,
         "telefonoEmpresa": company.telefonoEmpresa,
-        "interes": company.interes,
-        "relUsuarioEmpresa": company.relUsuarioEmpresa,
+        "interes": company.interes.map((i) => i.id).toList(),
+        "relUsuarioEmpresa": company.relUsuarioEmpresa.map((r) => r.id.usuario).toList(),
       }),
     );
-    if(response.statusCode==200){
-      return ApiResponse<Company>.fromJson(jsonDecode(response.body), (d)=> Company.fromJson(d)).datos;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final dto = CompanyDto.fromJson(data['datos']);
+      final tipoEmpresa = await CompanyTypeService().getTipoEmpresaById(dto.idTipoEmpresa);
+      final interes = await Future.wait(dto.interes.map((i) => InterestService().getInteresById(i.id)));
+      final relUsuarioEmpresa = await Future.wait(dto.relUsuarioEmpresa.map((r) => UserRoleCompanyService().getByUsuarioId(r.id.idUsuario)));
+      return Company(
+        id: dto.id,
+        tipoEmpresa: tipoEmpresa,
+        nombreEmpresa: dto.nombreEmpresa,
+        direccionEmpresa: dto.direccionEmpresa,
+        telefonoEmpresa: dto.telefonoEmpresa,
+        interes: interes,
+        relUsuarioEmpresa: relUsuarioEmpresa,
+      );
     } else {
       throw Exception("Error al actualizar Empresa numero ${response.statusCode}: ${response.body}");
     }
@@ -126,17 +171,30 @@ class CompanyService {
       },
       body: jsonEncode({
         "id": company.id,
-        "idTipoEmpresa": company.idTipoEmpresa,
+        "idTipoEmpresa": company.tipoEmpresa.id,
         "nombreEmpresa": company.nombreEmpresa,
         "direccionEmpresa": company.direccionEmpresa,
         "telefonoEmpresa": company.telefonoEmpresa,
-        "interes": company.interes,
-        "relUsuarioEmpresa": company.relUsuarioEmpresa,
+        "interes": company.interes.map((i) => i.id).toList(),
+        "relUsuarioEmpresa": company.relUsuarioEmpresa.map((r) => r.id.usuario).toList(),
       }),
     );
 
-    if(response.statusCode==200){
-      return ApiResponse<Company>.fromJson(jsonDecode(response.body), (d)=> Company.fromJson(d)).datos;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final dto = CompanyDto.fromJson(data['datos']);
+      final tipoEmpresa = await CompanyTypeService().getTipoEmpresaById(dto.idTipoEmpresa);
+      final interes = await Future.wait(dto.interes.map((i) => InterestService().getInteresById(i.id)));
+      final relUsuarioEmpresa = await Future.wait(dto.relUsuarioEmpresa.map((r) => UserRoleCompanyService().getByUsuarioId(r.id.idUsuario)));
+      return Company(
+        id: dto.id,
+        tipoEmpresa: tipoEmpresa,
+        nombreEmpresa: dto.nombreEmpresa,
+        direccionEmpresa: dto.direccionEmpresa,
+        telefonoEmpresa: dto.telefonoEmpresa,
+        interes: interes,
+        relUsuarioEmpresa: relUsuarioEmpresa,
+      );
     } else {
       throw Exception("Error al eliminar la empresa: ${response.body}");
     }
@@ -150,10 +208,60 @@ class CompanyService {
         "Content-Type": "application/json",
       },
     );
-    if(response.statusCode==200){
-      return ApiResponse<List<Company>>.fromJson(jsonDecode(response.body),(data) => (data as List).map((e) => Company.fromJson(e)).toList()).datos;
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final List<dynamic> empresasJson = data['datos'] ?? [];
+      List<Company> empresas = [];
+      for (var item in empresasJson) {
+        final dto = CompanyDto.fromJson(item);
+        final tipoEmpresa = await CompanyTypeService().getTipoEmpresaById(dto.idTipoEmpresa);
+        final interes = await Future.wait(dto.interes.map((i) => InterestService().getInteresById(i.id)));
+        final relUsuarioEmpresa = await Future.wait(dto.relUsuarioEmpresa.map((r) => UserRoleCompanyService().getByUsuarioId(r.id.idUsuario)));
+        empresas.add(Company(
+          id: dto.id,
+          tipoEmpresa: tipoEmpresa,
+          nombreEmpresa: dto.nombreEmpresa,
+          direccionEmpresa: dto.direccionEmpresa,
+          telefonoEmpresa: dto.telefonoEmpresa,
+          interes: interes,
+          relUsuarioEmpresa: relUsuarioEmpresa,
+        ));
+      }
+      return empresas;
     } else {
       throw Exception("Error al obtener empresa por id tipo empresa: ${response.body}");
     }
+  }
+
+  static Future<Company> getEmpresaById(int id) async {
+    final url = Uri.parse("$baseUrl/obtener/$id");
+    final response = await http.get(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final dto = CompanyDto.fromJson(data['datos']);
+      return await mapDtoToModel(dto);
+    } else {
+      throw Exception("Error al obtener empresa por id: ${response.body}");
+    }
+  }
+  
+  static Future<Company> mapDtoToModel(CompanyDto dto) async {
+    final tipoEmpresa = await CompanyTypeService().getTipoEmpresaById(dto.idTipoEmpresa);
+    final interes = await Future.wait(dto.interes.map((i) => InterestService().getInteresById(i.id)));
+    final relUsuarioEmpresa = await Future.wait(dto.relUsuarioEmpresa.map((r) => UserRoleCompanyService().getByUsuarioId(r.id.idUsuario)));
+    return Company(
+      id: dto.id,
+      tipoEmpresa: tipoEmpresa,
+      nombreEmpresa: dto.nombreEmpresa,
+      direccionEmpresa: dto.direccionEmpresa,
+      telefonoEmpresa: dto.telefonoEmpresa,
+      interes: interes,
+      relUsuarioEmpresa: relUsuarioEmpresa,
+    );
   }
 }

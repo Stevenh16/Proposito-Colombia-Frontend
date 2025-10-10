@@ -1,3 +1,9 @@
+import 'package:swallow_app/models/interest_id.dart';
+
+import '../dtos/interest_dto.dart';
+import '../dtos/interest_id_dto.dart';
+import '../services/user_service.dart';
+import '../services/company_service.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
@@ -5,6 +11,14 @@ import 'package:swallow_app/models/api_response.dart';
 import 'package:swallow_app/models/interest.dart';
 
 class InterestService {
+  Future<Interest> _mapDtoToModel(InterestDto dto) async {
+    final empresa = await CompanyService.getEmpresaById(dto.id.idEmpresa);
+    final usuario = await UserService().getUsuario(dto.id.idUsuario);
+    return Interest(
+      id: InterestId(empresa: empresa, usuario: usuario),
+      tipoInteres: dto.tipoInteres,
+    );
+  }
   static const String baseUrl = "http://localhost:3210/intereses";
 
   Future<Interest> createInteres(Interest dto) async {
@@ -19,7 +33,7 @@ class InterestService {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      return ApiResponse.fromJson(jsonData, (data) => Interest.fromJson(data)).datos;
+      return _mapDtoToModel(ApiResponse.fromJson(jsonData, (data) => InterestDto.fromJson(data)).datos);
     } else {
       throw Exception('Error al crear interes');
     }
@@ -37,7 +51,7 @@ class InterestService {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      return ApiResponse.fromJson(jsonData, (data) => Interest.fromJson(data)).datos;
+      return _mapDtoToModel(ApiResponse.fromJson(jsonData, (data) => InterestDto.fromJson(data)).datos);
     } else {
       throw Exception('Error al actualizar interes');
     }
@@ -92,12 +106,14 @@ class InterestService {
 
     if (response.statusCode == 200) {
       final jsonData = jsonDecode(response.body);
-      return ApiResponse.fromJson(
+      List<InterestDto> dtos = ApiResponse.fromJson(
         jsonData,
         (data) => (data as List)
-            .map((item) => Interest.fromJson(item))
+            .map((item) => InterestDto.fromJson(item))
             .toList(),
       ).datos;
+
+      return Future.wait(dtos.map((dto) => _mapDtoToModel(dto)));
     } else if (response.statusCode == 204) {
       return [];
     } else {
@@ -122,6 +138,18 @@ class InterestService {
       return jsonDecode(response.body) as bool;
     } else {
       throw Exception('Error al verificar seguimiento mutuo');
+    }
+  }
+
+  Future<Interest> getInteresById(InterestIdDto id) async {
+    final response = await http.get(Uri.parse('$baseUrl/${id.idUsuario}/${id.idEmpresa}'));
+
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      final dto = InterestDto.fromJson(jsonData['datos']);
+      return await _mapDtoToModel(dto);
+    } else {
+      throw Exception('Error al obtener interes por id');
     }
   }
 }
