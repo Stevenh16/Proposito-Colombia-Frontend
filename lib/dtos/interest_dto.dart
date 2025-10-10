@@ -1,5 +1,7 @@
+import 'package:swallow_app/dtos/interest_id_dto.dart';
+
 class InterestDto {
-  final int id;
+  final InterestIdDto id;
   final int tipoInteres;
 
   InterestDto({
