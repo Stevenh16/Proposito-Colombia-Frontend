@@ -1,6 +1,6 @@
 class Location {
   final int idUbicacion;
-  final Location idPadreUbicacion;
+  final Location? idPadreUbicacion;
   final String nombreUbicacion;
   final String idDaneUbicaicon;
   final String longitudUbicacion;

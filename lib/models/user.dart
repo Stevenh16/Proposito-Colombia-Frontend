@@ -6,7 +6,7 @@ class User {
   final String apellidosUsuario;
   final int estadoUsuario;
   final String documentoUsuario;
-  final Location ubicacionResponseDto;
+  final Location? ubicacionResponseDto;
 
   User({
     required this.idUsuario,
