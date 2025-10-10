@@ -2,13 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class VacanteCardView extends StatefulWidget {
-  const VacanteCardView({super.key});
+  final String titulo;
+  final String empresa;
+  final String descripcion;
+  final String imagenUrl;
+  final String salarioMin;
+  final String salarioMax;
+
+  const VacanteCardView({
+    super.key,
+    required this.titulo,
+    required this.empresa,
+    required this.descripcion,
+    required this.imagenUrl,
+    required this.salarioMin,
+    required this.salarioMax});
   @override
   State<VacanteCardView> createState() => _VacanteCardViewState();
 }
 class _VacanteCardViewState extends State<VacanteCardView> {
   final ScrollController _scrollController = ScrollController();
   bool _showButtons = true;
+  bool _isFullscreen = false;
   void _toggleButtons() {
     setState(() {
       _showButtons = !_showButtons;
@@ -26,19 +41,15 @@ class _VacanteCardViewState extends State<VacanteCardView> {
       curve: Curves.easeInOut,
     );
   }
+  void _toggleFullscreen() {
+    setState(() {
+      _isFullscreen = !_isFullscreen;
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Vacantes',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          elevation: 0,
-        ),
-        body: Stack(
+    return Stack(
           children: [
             SingleChildScrollView(
               controller: _scrollController,
@@ -55,22 +66,31 @@ class _VacanteCardViewState extends State<VacanteCardView> {
                             bottomRight: Radius.circular(20),
                           ),
                           child: Image.asset(
-                            'assets/images/oficina.jpg',
+                            widget.imagenUrl.isNotEmpty
+                                ? widget.imagenUrl
+                                : 'assets/images/default.jpg',
                             fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
+                              );
+                            },
                           ),
                         ),
                       ),
                       // Salario
-                      const Positioned(
+                      Positioned(
                         left: 16,
-                        bottom: 80,
-                        child: Text(
-                          "\$3.500.000 - \$4.500.000",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        bottom: 90,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _ChipSalario(widget.salarioMin),
+                            SizedBox(width: 6),
+                            _ChipSalario("-"),
+                            SizedBox(width: 6),
+                            _ChipSalario(widget.salarioMax),
+                          ],
                         ),
                       ),
                       // Palabras clave
@@ -105,18 +125,20 @@ class _VacanteCardViewState extends State<VacanteCardView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Diseñador UX/UI",
+                          widget.titulo,
                           style: TextStyle(
                             color: Theme.of(context).textTheme.bodyLarge?.color,
                             fontSize: 20,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          "CreativeStudio",
+                          widget.empresa,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontSize: 16,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -147,7 +169,7 @@ class _VacanteCardViewState extends State<VacanteCardView> {
                         _sectionCard(
                           title: "Descripción del trabajo",
                           content:
-                          "Buscamos un desarrollador frontend con experiencia en React y TypeScript para unirse a nuestro equipo de desarrollo y construir productos innovadores.",
+                          widget.descripcion,
                         ),
                         const SizedBox(height: 16),
 
@@ -192,7 +214,9 @@ class _VacanteCardViewState extends State<VacanteCardView> {
               child: Column(
                 children: [
                   _iconButtonSvgRounded(
-                    assetName: 'assets/icons/fullscreen.svg',
+                    assetName: _isFullscreen
+                        ? 'assets/icons/jusscreen.svg'
+                        : 'assets/icons/fullscreen.svg',
                     backgroundColor: Colors.white,
                     svgColor: Colors.blue,
                     onPressed: _toggleButtons,
@@ -230,7 +254,6 @@ class _VacanteCardViewState extends State<VacanteCardView> {
               ),
             ),
           ],
-        )
     );
   }
 }
@@ -369,11 +392,37 @@ class _ChipLabel extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontSize: 13),
+        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w400),
       ),
     );
   }
 }
+
+class _ChipSalario extends StatelessWidget {
+  final String text;
+  const _ChipSalario(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.green, // fondo verde para salario
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white, // texto blanco
+          fontFamily: 'Montserrat',
+          fontSize: 19,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}
+
 
 class _Tag extends StatelessWidget {
   final String text;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swallow_app/screens/vacantes/vacantes_screen.dart';
 import 'package:swallow_app/screens/vacantes/widgets/vacante_card.dart';
 
 import '../../screens/explorar/explorar_screen.dart';
@@ -17,11 +18,11 @@ class _BottomTabNavigatorState extends State<BottomTabNavigator> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-    VacanteCardView(),
+    VacantesScreen(),
     PostulacionesScreen(),
     MatchesScreen(),
     ExplorarScreen(),
-    VacanteCardView(),
+    VacantesScreen(),
     //VacantesScreen(), // Placeholder para Perfil
   ];
 

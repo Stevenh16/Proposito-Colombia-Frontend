@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swallow_app/screens/vacantes/vacantes_screen.dart';
 import '../screens/vacantes/widgets/vacante_card.dart';
 import 'route_names.dart';
 import '../screens/loading/loading_screen.dart';
@@ -17,7 +18,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const BottomTabNavigator());
 
       case RouteNames.vacantes:
-        return MaterialPageRoute(builder: (_) => const VacanteCardView());
+        return MaterialPageRoute(builder: (_) => const VacantesScreen());
 
       case RouteNames.postulaciones:
         return MaterialPageRoute(builder: (_) => const PostulacionesScreen());
